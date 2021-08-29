@@ -22,7 +22,7 @@ const {
   courses,
 } = require("../controllers/course");
 
-// get routes
+// get-routes
 router.get("/courses", courses);
 
 router.post("/course/upload-image", uploadImage);
