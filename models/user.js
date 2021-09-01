@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-const { Schema } = mongoose;
+const { ObjectId } = mongoose.Schema;
 
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -37,6 +37,7 @@ const userSchema = new Schema(
       data: String,
       default: "",
     },
+    courses: [{ type: ObjectId, ref: "Course" }],
   },
   { timestamps: true }
 );
