@@ -383,7 +383,7 @@ exports.paidEnrollment = async (req, res) => {
     // application fee 30%
     const fee = (course.price * 30) / 100;
     // create stripe session
-    const session = await stripe.checkout.session.create({
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       // purchase details
       line_items: [
@@ -416,3 +416,32 @@ exports.paidEnrollment = async (req, res) => {
     return res.status(400).send("Enrollment create failed");
   }
 };
+
+
+exports.stripeSuccess = async (req, res) => {
+  try {
+    // find course
+    const course = await Course.findById(req.params.courseId).exec();
+    // get user from db to get stripe session id
+    const user = await User.findById(req.user._id).exec();
+    // if no stripe session return
+    if (!user.stripeSession.id) return res.sendStatus(400);
+    // retrieve stripe session
+    const session = await stripe.checkout.sessions.retrieve(
+      user.stripeSession.id
+    );
+    console.log("STRIPE SUCCESS", session);
+    // if session payment status is paid, push course to user's course []
+    if (session.payment_status === "paid") {
+      await User.findByIdAndUpdate(user._id, {
+        $addToSet: { courses: course._id },
+        $set: { stripeSession: {} },
+      }).exec();
+    }
+    res.json({ success: true, course });
+  } catch (err) {
+    console.log("STRIPE SUCCESS ERR", err);
+    res.json({ success: false });
+  }
+};
+
