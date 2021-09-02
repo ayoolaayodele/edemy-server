@@ -55,7 +55,9 @@ router.put("/course/:slug/:lessonId", requireSignin, removeLesson);
 
 router.get("/check-enrollment/:courseId", requireSignin, checkEnrollment);
 
+
 // enrollment
 router.post("/free-enrollment/:courseId", requireSignin, freeEnrollment);
+
 
 module.exports = router;
