@@ -398,7 +398,7 @@ exports.paidEnrollment = async (req, res) => {
       payment_intent_data: {
         application_fee_amount: Math.round(fee.toFixed(2) * 100), //Application fee
         transfer_data: {
-          destination: course.instructor.stripe_account_id, // Remaining fee to the instructor
+          destination: course.instructor.stripe_account_id, // Remaining fees to the instructor
         },
       },
       // redirect url after successful payment
