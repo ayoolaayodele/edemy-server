@@ -417,7 +417,6 @@ exports.paidEnrollment = async (req, res) => {
   }
 };
 
-
 exports.stripeSuccess = async (req, res) => {
   try {
     // find course
@@ -445,3 +444,11 @@ exports.stripeSuccess = async (req, res) => {
   }
 };
 
+exports.userCourses = async (req, res) => {
+  const user = await User.findById(req.user._id).exec();
+  const courses = await Course.find({ _id: { $in: user.courses } }) //we find the id based what is in user.courses //note: enrolledcourses for paid and free=$in: user.courses
+    .populate("instructor", "_id name")
+    .exec();
+  res.json(courses);
+  console.log(courses);
+};
