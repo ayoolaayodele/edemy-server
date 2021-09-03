@@ -95,3 +95,30 @@ exports.instructorCourses = async (req, res) => {
     console.log(err);
   }
 };
+
+exports.studentCount = async (req, res) => {
+  try {
+    //select the id of the instructor and check the users model,
+    //check the courses in the users model and select only the id of the user that the courses are found
+
+    const users = await User.find({ courses: req.body.courseId })
+      .select("_id")
+      .exec();
+    res.json(users);
+    console.log(users);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.instructorBalance = async (req, res) => {
+  try {
+    let user = await User.findById(req.user._id).exec();
+    const balance = await stripe.balance.retrieve({
+      stripeAccount: user.stripe_account_id,
+    });
+    res.json(balance);
+  } catch (err) {
+    console.log(err);
+  }
+};
