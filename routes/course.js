@@ -3,7 +3,8 @@ const formidable = require("express-formidable");
 const router = express.Router();
 
 // middleware
-const { requireSignin, isInstructor } = require("../middleware");
+
+const { requireSignin, isInstructor, isEnrolled } = require("../middleware");
 
 // controllers
 const {

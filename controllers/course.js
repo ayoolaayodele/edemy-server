@@ -362,7 +362,6 @@ exports.freeEnrollment = async (req, res) => {
       },
       { new: true }
     ).exec();
-    console.log(result);
     res.json({
       message: "Congratulations! You have successfully enrolled",
       course,
@@ -450,5 +449,4 @@ exports.userCourses = async (req, res) => {
     .populate("instructor", "_id name")
     .exec();
   res.json(courses);
-  console.log(courses);
 };
