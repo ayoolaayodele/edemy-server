@@ -1,6 +1,7 @@
 const AWS = require("aws-sdk");
 const { nanoid } = require("nanoid"); //to give unique names to each upload to avoid conflict
 const Course = require("../models/course");
+const Completed = require("../models/completed");
 const User = require("../models/user");
 const slugify = require("slugify");
 const { readFileSync } = require("fs");
@@ -449,4 +450,67 @@ exports.userCourses = async (req, res) => {
     .populate("instructor", "_id name")
     .exec();
   res.json(courses);
+};
+
+exports.markCompleted = async (req, res) => {
+  const { courseId, lessonId } = req.body; //coming from frontend
+  // console.log(courseId, lessonId);
+  // find if user with that course is already created
+  const existing = await Completed.findOne({
+    user: req.user._id,
+    course: courseId,
+  }).exec();
+
+  if (existing) {
+    // update
+    const updated = await Completed.findOneAndUpdate(
+      {
+        user: req.user._id,
+        course: courseId,
+      },
+      {
+        $addToSet: { lessons: lessonId },
+      }
+    ).exec();
+    res.json({ ok: true });
+  } else {
+    // create
+    const created = await new Completed({
+      user: req.user._id,
+      course: courseId,
+      lessons: lessonId,
+    }).save();
+    res.json({ ok: true });
+  }
+};
+
+exports.listCompleted = async (req, res) => {
+  try {
+    const list = await Completed.findOne({
+      user: req.user._id,
+      course: req.body.courseId,
+    }).exec();
+    list && res.json(list.lessons);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.markIncomplete = async (req, res) => {
+  try {
+    const { courseId, lessonId } = req.body;
+
+    const updated = await Completed.findOneAndUpdate(
+      {
+        user: req.user._id,
+        course: courseId,
+      },
+      {
+        $pull: { lessons: lessonId },
+      }
+    ).exec();
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+  }
 };
